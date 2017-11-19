@@ -17,6 +17,11 @@ class HomeController extends Controller
 {
     public function index()
 	{
+        if(Auth::user()->level->name == 'Admin')
+        {
+            return redirect()->route('reports.index');
+        }
+
 		$washes = Wash::all();
 
 		return view('home.cashier')->with([

@@ -7,7 +7,7 @@
 @endsection
 
 @section('nav')
-	@if(Auth::user()->level == 'Admin')
+	@if(Auth::user()->level->name == 'Admin')
 		@include('layouts.nav.admin')
 	@else
 		@include('layouts.nav.cashier')
