@@ -7,9 +7,9 @@
 @endsection
 
 @section('nav')
-	@if(Auth::user()->level == 'Admin')
+	@if(Auth::user()->level->name == 'Admin')
 		@include('layouts.nav.admin')
-	@else
+	@elseif(Auth::user()->level->name == 'Kasir')
 		@include('layouts.nav.cashier')
 	@endif
 @endsection
@@ -44,19 +44,19 @@
 				<div class="input-group">
 					<input type="text" autofocus value="{{ session('washing_rate_search') }}" id="search" class="form-control" placeholder="Cari Nama">
 					<div class="input-group-btn">
-						<button id="search-btn" class="btn btn-primary" type="button">
+						<button id="search-btn" class="btn btn-primary" type="button" title="Klik: Terapkan Pencarian">
 							<span class="fa fa-search"></span>
 						</button>
 					</div>
 					<div class="input-group-btn">
-						<button id="refresh-btn" class="btn btn-warning" type="button">
+						<button id="refresh-btn" class="btn btn-warning" type="button" title="Klik: Reset Pencarian">
 							<span class="fa fa-refresh"></span>
 						</button>
 					</div>
 				</div>
 			</div>
 			<div class="col">
-				<button id="deleted-btn" class="btn btn-info btn-block {{ session('washing_rate_deleted') == '0' ? '' : 'active' }}" type="button" data-deleted="{{ session('washing_rate_deleted') }}">
+				<button id="deleted-btn" class="btn btn-info btn-block {{ session('washing_rate_deleted') == '0' ? '' : 'active' }}" type="button" data-deleted="{{ session('washing_rate_deleted') }}" title="{{ session('washing_rate_deleted') == '0' ? 'Klik: Tampilkan Semua Tarif' : 'Klik: Tampilkan Tarif Aktif' }}">
 					<span class="fa {{ session('washing_rate_deleted') == '0' ? 'fa-folder' : 'fa-folder-open' }}"></span>
 					<span id="deleted-text">{{ session('washing_rate_deleted') == '0' ? 'Tarif Aktif' : 'Semua Tarif' }}</span>
 				</button>
@@ -109,13 +109,13 @@
 	$("#deleted-btn").on('click', function(e) {
 		if($(this).data('deleted') == '0') {
 			ajaxLoad('{{ route('washing-rates.list') }}?deleted=1', 'data');
-			$(this).addClass('active').data('deleted', '1');
+			$(this).addClass('active').data('deleted', '1').attr('title', 'Klik: Tampilkan Tarif Aktif');
 			$(this).find('span.fa').removeClass('fa-folder').addClass('fa-folder-open');
 			$(this).find('#deleted-text').html('Semua Tarif');
 		}
 		else {
 			ajaxLoad('{{ route('washing-rates.list') }}?deleted=0', 'data');
-			$(this).removeClass('active').data('deleted', '0');
+			$(this).removeClass('active').data('deleted', '0').attr('title', 'Klik: Tampilkan Semua Tarif');
 			$(this).find('span.fa').removeClass('fa-folder-open').addClass('fa-folder');
 			$(this).find('#deleted-text').html('Tarif Aktif');
 		}
