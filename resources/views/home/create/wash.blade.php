@@ -7,22 +7,22 @@
 	<form action="{{ route('home.store.wash') }}" method="post" id="createWashForm" role="form">
 		{{ csrf_field() }}
 		<div class="form-group row">
-			<input type="hidden" id="inputtype" name="type" value="1">
+			<input type="hidden" id="inputtype2" name="type" value="1">
 			<div class="col-6">
-				<button id="umum-type-btn" class="btn btn-block btn-outline-info active" type="button">
+				<button id="umum-type-btn2" class="btn btn-block btn-outline-info active" type="button">
 					Umum
 				</button>
 			</div>
 			<div class="col-6">
-				<button id="karyawan-type-btn" class="btn btn-block btn-outline-info" type="button">
+				<button id="karyawan-type-btn2" class="btn btn-block btn-outline-info" type="button">
 					Karyawan
 				</button>
 			</div>
 		</div>
-		<div id="worker-description" class="form-group row" hidden>
-			<label for="inputdescription" class="col-5 col-form-label">Keterangan Karyawan</label>
+		<div id="worker-description2" class="form-group row" hidden>
+			<label for="inputdescription2" class="col-5 col-form-label">Keterangan Karyawan</label>
 			<div class="col-7">
-				<input type="text" id="inputdescription" name="description" value="{{ old('description') }}" class="form-control" autocomplete="off">
+				<input type="text" id="inputdescription2" name="description" value="{{ old('description') }}" class="form-control" autocomplete="off">
 			</div>
 		</div>
 		<div class="form-group row">
@@ -88,18 +88,18 @@
 		washing_rate_id = [],
 		price_total = 0;
 
-	$("#umum-type-btn").click(function() {
+	$("#umum-type-btn2").click(function() {
 		$(this).addClass('active');
-		$("#karyawan-type-btn").removeClass('active');
-		$("#inputtype").val('Umum');
-		$("#worker-description").attr('hidden', 'hidden').removeAttr('required');
+		$("#karyawan-type-btn2").removeClass('active');
+		$("#inputtype2").val('Umum');
+		$("#worker-description2").attr('hidden', 'hidden').find('#inputdescription2').removeAttr('required');
 	});
 
-	$("#karyawan-type-btn").click(function() {
+	$("#karyawan-type-btn2").click(function() {
 		$(this).addClass('active');
-		$("#umum-type-btn").removeClass('active');
-		$("#inputtype").val('Karyawan');
-		$("#worker-description").removeAttr('hidden').attr('required', 'required');
+		$("#umum-type-btn2").removeClass('active');
+		$("#inputtype2").val('Karyawan');
+		$("#worker-description2").removeAttr('hidden').find('#inputdescription2').attr('required', 'required');
 	});
 
 	$("#washModal").on('shown.bs.modal', function () {

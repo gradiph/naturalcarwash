@@ -39,8 +39,8 @@ class Transaction extends Model
 		);
 	}
 
-	public function washes()
+	public function wash()
 	{
-		return $this->hasMany('App\Wash');
+		return $this->hasOne('App\Wash');
 	}
 }

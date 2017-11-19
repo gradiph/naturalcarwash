@@ -246,8 +246,26 @@ class HomeController extends Controller
 
 	public function printInvoice(Transaction $transaction)
 	{
+		$transaction->load([
+			'wash' => function($query) {
+				$query->withTrashed();
+			},
+			'products' => function($query) {
+				$query->withTrashed();
+			},
+			'user' => function($query) {
+				$query->withTrashed();
+			},
+			'mechanics' => function($query) {
+				$query->withTrashed();
+			},
+		]);
+
 		return view('home.print.invoice')->with([
 			'transaction' => $transaction,
+			'wash' => $transaction->wash,
+			'products' => $transaction->products,
+			'mechanics' => $transaction->mechanics,
 		]);
 	}
 }
