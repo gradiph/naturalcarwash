@@ -3,11 +3,16 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Auth;
 
 class UserCreateRequest extends FormRequest
 {
     public function authorize()
     {
+        if(!Auth::check() || Auth::user()->level->name != 'Admin')
+        {
+            return false;
+        }
         return true;
     }
 
@@ -16,7 +21,7 @@ class UserCreateRequest extends FormRequest
         return [
             'name' => 'required',
             'username' => 'required|unique:users,username',
-            'level' => 'required|in:Kasir,Admin',
+            'level_id' => 'required|integer',
             'password' => 'required',
         ];
     }
@@ -27,8 +32,8 @@ class UserCreateRequest extends FormRequest
 			'name.required' => 'Nama tidak boleh kosong',
 			'username.required' => 'Username tidak boleh kosong',
 			'username.unique' => 'Username telah digunakan',
-			'level.required' => 'Jabatan tidak boleh kosong',
-			'level.in' => 'Jabatan salah',
+			'level_id.required' => 'Jabatan tidak boleh kosong',
+			'level_id.integer' => 'Jabatan salah',
 			'password.required' => 'Password tidak boleh kosong',
 		];
 	}

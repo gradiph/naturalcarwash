@@ -7,7 +7,7 @@
 @endsection
 
 @section('nav')
-	@if(Auth::user()->level == 'Admin')
+	@if(Auth::user()->level->name == 'Admin')
 		@include('layouts.nav.admin')
 	@else
 		@include('layouts.nav.cashier')
@@ -44,19 +44,19 @@
 				<div class="input-group">
 					<input type="text" autofocus value="{{ session('user_search') }}" id="search" class="form-control" placeholder="Cari Nama">
 					<div class="input-group-btn">
-						<button id="search-btn" class="btn btn-primary" type="button">
+						<button id="search-btn" class="btn btn-primary" type="button" title="Klik: Terapkan Pencarian">
 							<span class="fa fa-search"></span>
 						</button>
 					</div>
 					<div class="input-group-btn">
-						<button id="refresh-btn" class="btn btn-warning" type="button">
+						<button id="refresh-btn" class="btn btn-warning" type="button" title="Klik: Reset Pencarian">
 							<span class="fa fa-refresh"></span>
 						</button>
 					</div>
 				</div>
 			</div>
 			<div class="col">
-				<button id="deleted-btn" class="btn btn-info btn-block {{ session('user_deleted') == '0' ? '' : 'active' }}" type="button" data-deleted="{{ session('user_deleted') }}">
+				<button id="deleted-btn" class="btn btn-info btn-block {{ session('user_deleted') == '0' ? '' : 'active' }}" type="button" data-deleted="{{ session('user_deleted') }}" title="{{ session('user_deleted') == '0' ? 'Klik: Tampilkan Semua Tarif' : 'Klik: Tampilkan Tarif Aktif' }}">
 					<span class="fa {{ session('user_deleted') == '0' ? 'fa-folder' : 'fa-folder-open' }}"></span>
 					<span id="deleted-text">{{ session('user_deleted') == '0' ? 'Pengguna Aktif' : 'Semua Pengguna' }}</span>
 				</button>
@@ -109,13 +109,13 @@
 	$("#deleted-btn").on('click', function(e) {
 		if($(this).data('deleted') == '0') {
 			ajaxLoad('{{ route('users.list') }}?deleted=1', 'data');
-			$(this).addClass('active').data('deleted', '1');
+			$(this).addClass('active').data('deleted', '1').attr('title', 'Klik: Tampilkan Tarif Aktif');
 			$(this).find('span.fa').removeClass('fa-folder').addClass('fa-folder-open');
 			$(this).find('#deleted-text').html('Semua Pengguna');
 		}
 		else {
 			ajaxLoad('{{ route('users.list') }}?deleted=0', 'data');
-			$(this).removeClass('active').data('deleted', '0');
+			$(this).removeClass('active').data('deleted', '0').attr('title', 'Klik: Tampilkan Semua Tarif');
 			$(this).find('span.fa').removeClass('fa-folder-open').addClass('fa-folder');
 			$(this).find('#deleted-text').html('Pengguna Aktif');
 		}

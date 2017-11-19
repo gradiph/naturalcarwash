@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\UserLevel;
 use App\UserLog;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
@@ -19,7 +20,11 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('user.create');
+        $user_levels = UserLevel::all();
+
+        return view('user.create')->with([
+            'user_levels' => $user_levels,
+        ]);
     }
 
     public function store(UserCreateRequest $request)
@@ -30,7 +35,7 @@ class UserController extends Controller
 			'name' => $request->name,
 			'username' => $request->username,
 			'password' => bcrypt($request->password),
-			'level' => $request->level,
+			'level_id' => $request->level_id,
 		]);
 		if($user)
 		{
@@ -63,7 +68,12 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        return view('user.edit')->with('user', $user);
+        $user_levels = UserLevel::all();
+
+        return view('user.edit')->with([
+            'user' => $user,
+            'user_levels' => $user_levels,
+        ]);
     }
 
     public function update(UserUpdateRequest $request, User $user)
@@ -72,7 +82,7 @@ class UserController extends Controller
 
 		$user->name = $request->name;
 		$user->username = $request->username;
-		$user->level = $request->level;
+		$user->level_id = $request->level_id;
 		if($request->has('password')) $user->password = bcrypt($request->password);
 
 		if($user->save())
@@ -133,7 +143,7 @@ class UserController extends Controller
 		if(session('user_deleted') == '0')
 		{
 			$users = User::where('name', 'like', '%'.session('user_search').'%')
-				->orderBy('level', 'desc')
+				->orderBy('level_id', 'asc')
 				->orderBy('name', 'asc')
 				->paginate(6);
 		}
@@ -141,7 +151,7 @@ class UserController extends Controller
 		{
 			$users = User::withTrashed()
 				->where('name', 'like', '%'.session('user_search').'%')
-				->orderBy('level', 'desc')
+				->orderBy('level_id', 'asc')
 				->orderBy('name', 'asc')
 				->paginate(6);
 		}

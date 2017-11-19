@@ -7,9 +7,9 @@
 @endsection
 
 @section('nav')
-	@if(Auth::user()->level == 'Admin')
+	@if(Auth::user()->level->name == 'Admin')
 		@include('layouts.nav.admin')
-	@else
+	@elseif(Auth::user()->level->name == 'Kasir')
 		@include('layouts.nav.cashier')
 	@endif
 @endsection
@@ -57,14 +57,28 @@
 								</div>
 							</div>
 							<div class="form-group row">
-								<label for="inputlevel" class="col-4 col-form-label">Jabatan</label>
+								<label for="inputlevel_id" class="col-4 col-form-label">Jabatan</label>
 								<div class="col-8">
-									<select name="level" id="inputlevel" class="form-control" required>
-										<option value="Kasir" {{ old('level') == 'Kasir' ? 'selected' : '' }}>Kasir</option>
-										<option value="Admin" {{ old('level') == 'Admin' ? 'selected' : '' }}>Admin</option>
-									</select>
-									@if($errors->has('level'))
-										<div class="invalid-feedback" style="font-size: 0.9em;">{{ $errors->get('level')[0] }}</div>
+								    @foreach($user_levels as $user_level)
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio" class="form-check-input" name="level_id" value="{{ $user_level->id }}" {{ old('level_id') == $user_level->id ? 'checked' : '' }}>
+                                                {{ $user_level->name }}
+                                            </label>
+                                        </div>
+									@endforeach
+									{{--
+                                    <div class="row no-gutters">
+									    <div class="col-auto">
+									        <p class="form-control-plaintext">Jabatan Baru:&nbsp;</p>
+									    </div>
+									    <div class="col">
+									        <input type="text" class="form-control" name="level_name">
+									    </div>
+									</div>
+									--}}
+									@if($errors->has('level_id'))
+										<div class="invalid-feedback" style="font-size: 0.9em;">{{ $errors->get('level_id')[0] }}</div>
 									@endif
 								</div>
 							</div>
@@ -96,14 +110,14 @@
 	@elseif($errors->has('username'))
 		$("#inputname").addClass('is-valid');
 		$("#inputusername").focus().addClass('is-invalid');
-	@elseif($errors->has('level'))
+	@elseif($errors->has('level_id'))
 		$("#inputname").addClass('is-valid');
 		$("#inputusername").addClass('is-valid');
-		$("#inputlevel").focus().addClass('is-invalid');
+		$("#inputlevel_id").focus().addClass('is-invalid');
 	@elseif($errors->has('password'))
 		$("#inputname").addClass('is-valid');
 		$("#inputusername").addClass('is-valid');
-		$("#inputlevel").addClass('is-valid');
+		$("#inputlevel_id").addClass('is-valid');
 		$("#inputpassword").focus().addClass('is-invalid');
 	@endif
 
