@@ -1,5 +1,6 @@
 <?php
 
+use App\UserLevel;
 use App\User;
 use Illuminate\Database\Seeder;
 
@@ -12,17 +13,24 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
+        UserLevel::create([
+            'name' => 'Admin',
+        ]);
+        UserLevel::create([
+            'name' => 'Kasir',
+        ]);
+
         User::create([
 			'name' => 'Admin',
 			'username' => 'admin',
 			'password' => bcrypt('admin'),
-			'level' => 'Admin',
+			'user_level_id' => '1',
 		]);
         User::create([
 			'name' => 'Kasir',
 			'username' => 'kasir',
 			'password' => bcrypt('kasir'),
-			'level' => 'Kasir',
+			'user_level_id' => '2',
 		]);
     }
 }

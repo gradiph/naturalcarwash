@@ -15,7 +15,7 @@ class CreateExpendituresTable extends Migration
     {
         Schema::create('expenditures', function (Blueprint $table) {
             $table->increments('id');
-			$table->enum('type', ['Listrik', 'Shampoo & Keperluan Salon', 'Lain-lain']);
+			$table->unsignedInteger('type_id');
 			$table->string('description');
 			$table->integer('price');
 			$table->unsignedInteger('user_id');

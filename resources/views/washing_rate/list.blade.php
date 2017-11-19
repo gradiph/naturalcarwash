@@ -25,7 +25,7 @@
 	</table>
 </div>
 <div>
-	<small>Catatan: Klik nama mekanik untuk melihat informasi lebih lengkap.</small>
+	<small>Catatan: Klik nama tarif untuk melihat informasi lebih lengkap.</small>
 </div>
 <div class="row">
     <div class="col-4">

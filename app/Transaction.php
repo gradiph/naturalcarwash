@@ -11,14 +11,14 @@ class Transaction extends Model
     protected $fillable = [
 		'user_id', //unsignedInteger
 		'type', //enum['Umum', 'Karyawan']
-		'description', //string
+		'worker_description', //string, nullable
 		'creation_date', //timestamp
 		'status', //enum['1', '0'] : 1=success, 0=cancel
-		'cancel_reason', //string
+		'cancel_reason', //string, nullable
     ];
 
 	protected $dates = [
-		'creation_date', 'deleted_at',
+		'creation_date',
 	];
 
 	public function mechanics()

@@ -2,12 +2,17 @@
 
 namespace App\Http\Requests;
 
+use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 class WashingRateCreateRequest extends FormRequest
 {
     public function authorize()
     {
+        if(!Auth::check() || Auth::user()->level->name != 'Admin')
+        {
+            return false;
+        }
         return true;
     }
 

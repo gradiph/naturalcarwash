@@ -12,7 +12,7 @@ class Product extends Model
 	public $timestamps = false;
 
     protected $fillable = [
-        'type', //enum['Minuman', 'Parfum', 'Gelas Kopi', 'Lain-lain']
+        'type_id', //unsignedSmallInteger
 		'name', //string
 		'qty', //integer
 		'price', //integer
@@ -24,6 +24,14 @@ class Product extends Model
 
 	public function transactions()
 	{
-		return $this->belongsToMany('App\Transaction')->withPivot('qty', 'price');
+		return $this->belongsToMany('App\Transaction')->withPivot(
+            'qty', //integer
+            'price' //integer
+        );
 	}
+
+    public function type()
+    {
+        return $this->belongsTo('App\ProductType');
+    }
 }

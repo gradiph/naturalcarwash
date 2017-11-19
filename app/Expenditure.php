@@ -9,7 +9,7 @@ class Expenditure extends Model
 	public $timestamps = false;
 
     protected $fillable = [
-		'type', //enum['Listrik', 'Shampoo & Keperluan Salon', 'Lain-lain']
+        'type_id', //unsignedSmallInteger
 		'description', //string
 		'price', //integer
 		'user_id', //unsignedInteger
@@ -24,4 +24,9 @@ class Expenditure extends Model
 	{
 		return $this->belongsTo('App\User');
 	}
+
+    public function type()
+    {
+        return $this->belongsTo('App\ExpenditureType');
+    }
 }

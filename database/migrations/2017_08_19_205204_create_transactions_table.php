@@ -17,7 +17,7 @@ class CreateTransactionsTable extends Migration
             $table->bigIncrements('id');
 			$table->unsignedInteger('user_id');
 			$table->enum('type', ['Umum', 'Karyawan']);
-			$table->string('description')->nullable();
+			$table->string('worker_description')->nullable();
             $table->timestamp('creation_date');
 			$table->enum('status', ['1', '0']);
 			$table->string('cancel_reason')->nullable();

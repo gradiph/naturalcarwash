@@ -4,11 +4,16 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Auth;
 
 class UserUpdateRequest extends FormRequest
 {
     public function authorize()
     {
+        if(!Auth::check() || Auth::user()->level->name != 'Admin')
+        {
+            return false;
+        }
         return true;
     }
 
@@ -20,7 +25,7 @@ class UserUpdateRequest extends FormRequest
 				'required',
 				Rule::unique('users')->ignore($this->input('id')),
 			],
-            'level' => 'required|in:Kasir,Admin',
+            'level_id' => 'required|integer',
             'password' => 'required_if:changepassword,1',
         ];
     }
@@ -31,8 +36,8 @@ class UserUpdateRequest extends FormRequest
 			'name.required' => 'Nama tidak boleh kosong',
 			'username.required' => 'Username tidak boleh kosong',
 			'username.unique' => 'Username telah digunakan',
-			'level.required' => 'Jabatan tidak boleh kosong',
-			'level.in' => 'Jabatan salah',
+			'level_id.required' => 'Jabatan tidak boleh kosong',
+			'level_id.integer' => 'Jabatan salah',
 			'password.required_if' => 'Password tidak boleh kosong',
 		];
 	}

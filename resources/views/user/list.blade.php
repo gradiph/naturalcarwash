@@ -16,7 +16,7 @@
 							{{ $user->name }}
 						</a>
 					</td>
-					<td>{{ $user->level }}</td>
+					<td>{{ $user->level->name }}</td>
 					<td>{{ $user->deleted_at == null ? 'Aktif' : 'Nonaktif' }}</td>
 				</tr>
 			@endforeach

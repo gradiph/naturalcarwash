@@ -19,7 +19,7 @@
 				<tr>
 					<td class="align-top">Jabatan</td>
 					<td class="align-top">&nbsp; : &nbsp;</td>
-					<td class="align-top">{{ $user->level }}</td>
+					<td class="align-top">{{ $user->level->name }}</td>
 				</tr>
 				<tr>
 					<td class="align-top">Status</td>
