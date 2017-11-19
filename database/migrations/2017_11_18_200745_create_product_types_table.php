@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePurchasesTable extends Migration
+class CreateProductTypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,9 @@ class CreatePurchasesTable extends Migration
      */
     public function up()
     {
-        Schema::create('purchases', function (Blueprint $table) {
+        Schema::create('product_types', function (Blueprint $table) {
             $table->increments('id');
-			$table->enum('type', ['Minuman', 'Parfum', 'Gelas Kopi', 'Lain-lain']);
-			$table->string('name');
-			$table->integer('qty');
-			$table->integer('price');
-            $table->timestamp('creation_date');
-			$table->unsignedInteger('user_id');
+            $table->string('name');
         });
     }
 
@@ -31,6 +26,6 @@ class CreatePurchasesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('purchases');
+        Schema::dropIfExists('product_types');
     }
 }

@@ -14,7 +14,7 @@ class User extends Authenticatable
         'name', //string
 		'username', //string
 		'password', //string
-		'level', //enum['Kasir', 'Admin']
+		'level_id', //unsignedInteger
     ];
 
     protected $hidden = [
@@ -35,13 +35,13 @@ class User extends Authenticatable
 		return $this->hasMany('App\Expenditure');
 	}
 
-	public function userLogs()
+	public function logs()
 	{
 		return $this->hasMany('App\UserLog');
 	}
 
-	public function purchases()
-	{
-		return $this->hasMany('App\Purchase');
-	}
+    public function level()
+    {
+        return $this->belongsTo('App\UserLevel');
+    }
 }

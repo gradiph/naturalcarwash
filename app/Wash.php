@@ -25,7 +25,7 @@ class Wash extends Model
 		return $this->belongsTo('App\Transaction');
 	}
 
-	public function washingRates()
+	public function rates()
 	{
 		return $this->belongsToMany('App\WashingRate')->withPivot(
 			'price' //integer
