@@ -24,13 +24,13 @@ class UsersTableSeeder extends Seeder
 			'name' => 'Admin',
 			'username' => 'admin',
 			'password' => bcrypt('admin'),
-			'user_level_id' => '1',
+			'level_id' => '1',
 		]);
         User::create([
 			'name' => 'Kasir',
 			'username' => 'kasir',
 			'password' => bcrypt('kasir'),
-			'user_level_id' => '2',
+			'level_id' => '2',
 		]);
     }
 }
