@@ -7,9 +7,9 @@
 @endsection
 
 @section('nav')
-	@if(Auth::user()->level == 'Admin')
+	@if(Auth::user()->level->name == 'Admin')
 		@include('layouts.nav.admin')
-	@else
+	@else(Auth::user()->level->name == 'Kasir')
 		@include('layouts.nav.cashier')
 	@endif
 @endsection
@@ -56,6 +56,14 @@
 				</div>
 			</div>
 			<div class="col">
+				<select id="inputstatus" class="form-control">
+					<option value="">Filter Kondisi</option>
+					<option value="Baru" {{ session('tool_status') == 'Bagus' ? 'selected' : '' }}>Bagus</option>
+					<option value="Kurang Bagus" {{ session('tool_status') == 'Kurang Bagus' ? 'selected' : '' }}>Kurang Bagus</option>
+					<option value="Rusak" {{ session('tool_status') == 'Rusak' ? 'selected' : '' }}>Rusak</option>
+				</select>
+			</div>
+			<div class="col">
 				<a id="new-btn" class="btn btn-success btn-block" href="{{ route('tools.create') }}">
 					<span class="fa fa-plus"></span> Peralatan Baru
 				</a>
@@ -83,6 +91,10 @@
 @section('script')
 <script>
 	ajaxLoad('{{ route('tools.list') }}', 'data');
+
+	$("#inputstatus").change(function() {
+		ajaxLoad('{{ route('tools.list') }}?okstatus=1&status=' + $(this).val(), 'data');
+	});
 
 	$("#search").on('keyup', function(e) {
 		if(e.keyCode == 13) {

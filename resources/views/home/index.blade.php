@@ -11,7 +11,11 @@
 @endsection
 
 @section('nav')
-	@include('layouts.nav.cashier')
+	@if(Auth::user()->level->name == 'Admin')
+		@include('layouts.nav.admin')
+	@else
+		@include('layouts.nav.cashier')
+	@endif
 @endsection
 
 @section('header')
@@ -51,7 +55,7 @@
 													<span class="fa fa-lg fa-calculator"></span>
 												</button>
 												<button class="btn btn-lg btn-outline-warning add-beverage-btn" type="button" data-link="{{ route('home.wash.add.beverage', ['wash' => $wash->id]) }}">
-													<span class="fa fa-lg fa-beer"></span>
+													<span class="fa fa-lg fa-cubes"></span>
 												</button>
 												<button class="btn btn-lg btn-outline-success check-btn" type="button" data-action="{{ route('home.wash.check', ['wash' => $wash->id]) }}">
 													<span class="fa fa-lg fa-check"></span>
@@ -117,15 +121,13 @@
 										<input type="text" id="inputqty" name="qty" value="{{ old('qty') }}" class="form-control" autocomplete="off" placeholder="1">
 									</div>
 								</div>
-								<div class="form-group row">
-									<label for="inputname" class="col-4 col-form-label">Nama Minuman</label>
-									<div class="col-8">
-										<input type="text" id="inputname" name="name" value="{{ old('name') }}" class="form-control" autocomplete="off">
-										<div id="showProduct"></div>
-									</div>
+								<div class="form-group">
+									<label for="inputname" class="col-form-label">Nama Minuman/Parfum:</label>
+									<input type="text" id="inputname" name="name" value="{{ old('name') }}" class="form-control" autocomplete="off">
+									<div id="showProduct"></div>
 								</div>
 								<button id="add-beverage-btn" class="btn btn-block btn-success" type="submit">
-									<span class="fa fa-plus"></span> Tambah Minuman
+									<span class="fa fa-plus"></span> Tambah Minuman/Parfum
 								</button>
 								<hr>
 								<h3>

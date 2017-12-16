@@ -7,9 +7,9 @@
 @endsection
 
 @section('nav')
-	@if(Auth::user()->level == 'Admin')
+	@if(Auth::user()->level->name == 'Admin')
 		@include('layouts.nav.admin')
-	@else
+	@elseif(Auth::user()->level->name == 'Kasir')
 		@include('layouts.nav.cashier')
 	@endif
 @endsection
@@ -42,7 +42,7 @@
 		<div class="row">
 			<div class="col-12 col-sm-6 col-md-5">
 				<div class="input-group">
-					<input type="text" autofocus value="{{ session('user_log_search') }}" id="search" class="form-control" placeholder="Cari Nama">
+					<input type="text" autofocus value="{{ session('user_log_search') }}" id="search" class="form-control" placeholder="Cari Nama atau Keterangan">
 					<div class="input-group-btn">
 						<button id="search-btn" class="btn btn-primary" type="button">
 							<span class="fa fa-search"></span>
@@ -54,6 +54,12 @@
 						</button>
 					</div>
 				</div>
+			</div>
+			<div class="col">
+				<input type="date" id="inputdate1" name="date1" class="form-control btn-info" value="{{ session('user_log_date1', date('Y-m-d')) }}">
+			</div>
+			<div class="col">
+				<input type="date" id="inputdate2" name="date2" class="form-control btn-info" value="{{ session('user_log_date2', date('Y-m-d')) }}">
 			</div>
 		</div>
 	</article>
@@ -93,6 +99,14 @@
 	$("#refresh-btn").on('click', function(e) {
 		$("#search").val('').focus();
 		ajaxLoad('{{ route('user-logs.list') }}?oksearch=1&search=', 'data');
+	});
+
+	$("#inputdate1").change(function() {
+		ajaxLoad('{{ route('user-logs.list') }}?okdate1=1&date1=' + $(this).val(), 'data');
+	});
+
+	$("#inputdate2").change(function() {
+		ajaxLoad('{{ route('user-logs.list') }}?okdate2=1&date2=' + $(this).val(), 'data');
 	});
 </script>
 @endsection

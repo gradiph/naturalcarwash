@@ -21,7 +21,7 @@ class LoginController extends Controller
 	{
 		if(Auth::check())
 		{
-			if(Auth::user()->level == 'Admin')
+			if(Auth::user()->level->name == 'Admin')
 			{
 				return redirect()->route('reports.index');
 			}
@@ -40,7 +40,7 @@ class LoginController extends Controller
 	{
 		if(Auth::attempt(['username' => $request->username, 'password' => $request->password], true))
 		{
-			if(Auth::user()->level == 'Admin')
+			if(Auth::user()->level->name == 'Admin')
 			{
 				return redirect()->route('reports.index');
 			}

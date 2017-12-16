@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Expenditure;
+use App\ExpenditureType;
 use App\Product;
-use App\Purchase;
+use App\ProductType;
 use App\UserLog;
 use App\Http\Requests\ProductCreateRequest;
 use App\Http\Requests\ProductUpdateRequest;
@@ -13,46 +15,35 @@ use DB;
 
 class ProductController extends Controller
 {
-    public function index($type = null)
+    public function index()
     {
-		if($type != 'Minuman' && $type != 'Parfum' && $type != 'Gelas Kopi')
-		{
-			return redirect()->route('products.index', ['type' => 'Minuman'])->with([
-				'alert_messages' => $type.' tidak ditemukan. Mengembalikan ke semula: Minuman',
-				'alert_type' => 'alert-info',
-			]);
-		}
-		session(['product_type' => $type]);
-		$type = preg_replace('/\s+/', '', $type);
-        return view('product.index')->with('type', $type);
+		$types = ProductType::where('id', '!=', '1')
+			->get();
+
+        return view('product.index')->with([
+			'types' => $types,
+		]);
     }
 
-    public function create($type = null)
+    public function create()
     {
-        if($type != 'Minuman' && $type != 'Parfum' && $type != 'Gelas Kopi')
-		{
-			return redirect()->route('products.index', ['type' => 'Minuman'])->with([
-				'alert_messages' => $type.' tidak ditemukan. Mengembalikan ke semula: Minuman',
-				'alert_type' => 'alert-info',
-			]);
-		}
-		session(['product_type' => $type]);
-		$type = preg_replace('/\s+/', '', $type);
-		return view('product.create')->with('type', $type);
+        $types = ProductType::where('id', '!=', '1')
+			->get();
+
+		$products = Product::with('type')
+			->orderBy('type_id', 'asc')
+			->orderBy('name', 'asc')
+			->get();
+
+        return view('product.create')->with([
+			'types' => $types,
+			'products' => $products,
+		]);
     }
 
-    public function store(ProductCreateRequest $request, $type = null)
+    public function store(ProductCreateRequest $request)
     {
-        if($type != 'Minuman' && $type != 'Parfum' && $type != 'Gelas Kopi')
-		{
-			return redirect()->route('products.index', ['type' => 'Minuman'])->with([
-				'alert_messages' => $type.' tidak ditemukan. Mengembalikan ke semula: Minuman',
-				'alert_type' => 'alert-info',
-			]);
-		}
-		session(['product_type' => $type]);
-
-		DB::beginTransaction();
+        DB::beginTransaction();
 
 		if($request->has('id'))
 		{
@@ -60,234 +51,196 @@ class ProductController extends Controller
 			$product->qty += $request->qty;
 			if($product->save())
 			{
-				$purchase = Purchase::create([
-					'type' => session('product_type'),
-					'name' => $product->name,
-					'qty' => $request->qty,
-					'price' => $product->price,
-					'creation_date' => date('Y-m-d H:i:s'),
-					'user_id' => Auth::id(),
-				]);
-				if($purchase)
-				{
-					$userLog = UserLog::create([
-						'user_id' => Auth::id(),
-						'description' => 'Menambah stok '.session('product_type').' ID #'.$product->id.' ('.$product->name.')',
-						'creation_date' => date('Y-m-d H:i:s'),
-					]);
-					if($userLog)
-					{
-						DB::commit();
-						return redirect()->route('products.index', ['type' => session('product_type')])->with([
-							'alert_messages' => 'Penambahan stok '.session('product_type').' '.$product->name.' berhasil',
-							'alert_type' => 'alert-success',
-						]);
-					}
-				}
-			}
-			DB::rollBack();
-			return redirect()->route('products.index', ['type' => session('product_type')])->withInput()->with([
-				'alert_messages' => 'Penambahan stok '.session('product_type').' '.$request->name.' gagal',
-				'alert_type' => 'alert-danger',
-			]);
-		}
-		$product = Product::create([
-			'type' => session('product_type'),
-			'name' => $request->name,
-			'price' => $request->price,
-			'qty' => $request->qty,
-		]);
-		if($product)
-		{
-			$purchase = Purchase::create([
-				'type' => session('product_type'),
-				'name' => $product->name,
-				'qty' => $request->qty,
-				'price' => $product->price,
-				'creation_date' => date('Y-m-d H:i:s'),
-				'user_id' => Auth::id(),
-			]);
-			if($purchase)
-			{
 				$userLog = UserLog::create([
 					'user_id' => Auth::id(),
-					'description' => 'Membuat '.session('product_type').' ID #'.$product->id.' ('.$product->name.')',
+					'description' => 'Menambah stok '.$product->type->name.' ID #'.$product->id.' ('.$product->name.')',
 					'creation_date' => date('Y-m-d H:i:s'),
 				]);
 				if($userLog)
 				{
-					DB::commit();
-					return redirect()->route('products.index', ['type' => session('product_type')])->with([
-						'alert_messages' => 'Pembuatan '.session('product_type').' '.$product->name.' berhasil',
-						'alert_type' => 'alert-success',
-					]);
+					goto success;
 				}
 			}
 		}
+		else
+		{
+			if($request->type_id == '1')
+			{
+				$type = ProductType::create([
+					'name' => $request->type,
+				]);
+
+				$product = Product::create([
+					'type_id' => $type->id,
+					'name' => $request->name,
+					'price' => $request->price,
+					'qty' => $request->qty,
+				]);
+			}
+			else
+			{
+				$product = Product::create([
+					'type_id' => $request->type_id,
+					'name' => $request->name,
+					'price' => $request->price,
+					'qty' => $request->qty,
+				]);
+			}
+
+			if($product)
+			{
+				$userLog = UserLog::create([
+					'user_id' => Auth::id(),
+					'description' => 'Membuat '.$product->type->name.' ID #'.$product->id.' ('.$product->name.')',
+					'creation_date' => date('Y-m-d H:i:s'),
+				]);
+				if($userLog)
+				{
+					goto success;
+				}
+			}
+		}
+
 		DB::rollBack();
-		return redirect()->route('products.create', ['type' => session('product_type')])->withInput()->with([
-			'alert_messages' => 'Pembuatan '.session('product_type').' '.$request->name.' gagal',
+		return redirect()->route('products.index')->with([
+			'alert_messages' => 'Penambahan stok '.$product->type->name.' '.$product->name.' gagal',
 			'alert_type' => 'alert-danger',
+		]);
+
+		success:
+		DB::commit();
+		return redirect()->route('products.index')->with([
+			'alert_messages' => 'Penambahan stok '.$product->type->name.' '.$product->name.' berhasil',
+			'alert_type' => 'alert-success',
 		]);
     }
 
-    public function show($type = null, $product)
+    public function show($product)
     {
-        if($type != 'Minuman' && $type != 'Parfum' && $type != 'Gelas Kopi')
-		{
-			return redirect()->route('products.index', ['type' => 'Minuman'])->with([
-				'alert_messages' => $type.' tidak ditemukan. Mengembalikan ke semula: Minuman',
-				'alert_type' => 'alert-info',
-			]);
-		}
-		session(['product_type' => $type]);
+        $product = Product::withTrashed()
+			->with('type')
+			->find($product);
 
-		$product = Product::withTrashed()->find($product);
 		return view('product.show')->with('product', $product);
     }
 
-    public function edit($type = null, Product $product)
+    public function edit(Product $product)
     {
-        if($type != 'Minuman' && $type != 'Parfum' && $type != 'Gelas Kopi')
-		{
-			return redirect()->route('products.index', ['type' => 'Minuman'])->with([
-				'alert_messages' => $type.' tidak ditemukan. Mengembalikan ke semula: Minuman',
-				'alert_type' => 'alert-info',
-			]);
-		}
-		session(['product_type' => $type]);
-		$type = preg_replace('/\s+/', '', $type);
+		$types = ProductType::where('id', '!=', '1')
+			->get();
+
+		$product->load('type');
 
 		return view('product.edit')->with([
 			'product' => $product,
-			'type' => $type,
+			'types' => $types,
 		]);
     }
 
-    public function update(ProductUpdateRequest $request, $type = null, Product $product)
+    public function update(ProductUpdateRequest $request, Product $product)
     {
-        if($type != 'Minuman' && $type != 'Parfum' && $type != 'Gelas Kopi')
-		{
-			return redirect()->route('products.index', ['type' => 'Minuman'])->with([
-				'alert_messages' => $type.' tidak ditemukan. Mengembalikan ke semula: Minuman',
-				'alert_type' => 'alert-info',
-			]);
-		}
-		session(['product_type' => $type]);
-
-		DB::beginTransaction();
+        DB::beginTransaction();
 
 		$product->name = $request->name;
 		$product->price = $request->price;
-		$product->qty = $request->qty;
+
+		if($request->type_id == '1')
+		{
+			$type = ProductType::create([
+				'name' => $request->type,
+			]);
+
+			$product->type_id = $type->id;
+		}
+		else
+		{
+			$product->type_id = $request->type_id;
+		}
 
 		if($product->save())
 		{
 			$userLog = UserLog::create([
 				'user_id' => Auth::id(),
-				'description' => 'Mengubah '.session('product_type').' ID #'.$product->id.' ('.$product->name.')',
+				'description' => 'Mengubah '.$product->type->name.' ID #'.$product->id.' ('.$product->name.')',
 				'creation_date' => date('Y-m-d H:i:s'),
 			]);
 			if($userLog)
 			{
-				DB::commit();
-				return redirect()->route('products.index', ['type' => session('product_type')])->with([
-					'alert_messages' => 'Pengubahan '.session('product_type').' '.$product->name.' berhasil',
-					'alert_type' => 'alert-success',
-				]);
+				goto success;
 			}
 		}
+
 		DB::rollBack();
-		return redirect()->route('products.edit', ['type' => session('product_type'), 'product' => $product->id])->withInput()->with([
-			'alert_messages' => 'Pengubahan '.session('product_type').' '.$request->name.' gagal',
+		return redirect()->route('products.edit', ['product' => $product->id])->withInput()->with([
+			'alert_messages' => 'Pengubahan '.$product->type->name.' '.$request->name.' gagal',
 			'alert_type' => 'alert-danger',
+		]);
+
+		success:
+		DB::commit();
+		return redirect()->route('products.index')->with([
+			'alert_messages' => 'Pengubahan '.$product->type->name.' '.$product->name.' berhasil',
+			'alert_type' => 'alert-success',
 		]);
     }
 
-    public function destroy($type = null, Product $product)
+    public function destroy(Product $product)
     {
-        if($type != 'Minuman' && $type != 'Parfum' && $type != 'Gelas Kopi')
-		{
-			return redirect()->route('products.index', ['type' => 'Minuman'])->with([
-				'alert_messages' => $type.' tidak ditemukan. Mengembalikan ke semula: Minuman',
-				'alert_type' => 'alert-info',
-			]);
-		}
-		session(['product_type' => $type]);
-
-		DB::beginTransaction();
+        DB::beginTransaction();
 
 		if($product->delete())
 		{
 			$userLog = UserLog::create([
 				'user_id' => Auth::id(),
-				'description' => 'Menonaktifkan '.session('product_type').' ID #'.$product->id.' ('.$product->name.')',
+				'description' => 'Menonaktifkan '.$product->type->name.' ID #'.$product->id.' ('.$product->name.')',
 				'creation_date' => date('Y-m-d H:i:s'),
 			]);
 			if($userLog)
 			{
-				DB::commit();
-				return redirect()->route('products.index', ['type' => session('product_type')])->with([
-					'alert_messages' => 'Menonaktifkan '.session('product_type').' '.$product->name.' berhasil',
-					'alert_type' => 'alert-success',
-				]);
+				goto success;
 			}
 		}
+
 		DB::rollBack();
-		return redirect()->route('products.index', ['type' => session('product_type')])->with([
-			'alert_messages' => 'Menonaktifkan '.session('product_type').' '.$product->name.' gagal',
+		return redirect()->route('products.index')->with([
+			'alert_messages' => 'Menonaktifkan '.$product->type->name.' '.$product->name.' gagal',
 			'alert_type' => 'alert-danger',
+		]);
+
+		success:
+		DB::commit();
+		return redirect()->route('products.index')->with([
+			'alert_messages' => 'Menonaktifkan '.$product->type->name.' '.$product->name.' berhasil',
+			'alert_type' => 'alert-success',
 		]);
     }
 
-	public function dataList($type = null, Request $request)
+	public function dataList(Request $request)
 	{
-		if($type != 'Minuman' && $type != 'Parfum' && $type != 'Gelas Kopi')
-		{
-			return redirect()->route('products.index', ['type' => 'Minuman'])->with([
-				'alert_messages' => $type.' tidak ditemukan. Mengembalikan ke semula: Minuman',
-				'alert_type' => 'alert-info',
-			]);
-		}
-		session(['product_type' => $type]);
-		$type = preg_replace('/\s+/', '', $type);
+		session(['product_search' => $request->has('oksearch') ? $request->search : session('product_search', '')]);
+		session(['product_deleted' => $request->has('deleted') ? $request->deleted : session('product_deleted', '0')]);
+		session(['product_type' => $request->has('oktype') ? $request->type : session('product_type', '')]);
 
-		session([$type.'_search' => $request->has('oksearch') ? $request->search : session($type.'_search', '')]);
-		session([$type.'_deleted' => $request->has('deleted') ? $request->deleted : session($type.'_deleted', '0')]);
-
-		if(session($type.'_deleted') == '0')
+		$products = Product::with('type')
+			->where('name', 'like', '%'.session('product_search').'%');
+		if(session('product_deleted') == '0')
 		{
-			$products = Product::where('name', 'like', '%'.session($type.'_search').'%')
-				->where('type', session('product_type'))
-				->orderBy('name', 'asc')
-				->paginate(6);
+			$products->withTrashed();
 		}
-		else
+		if(session('product_type') != '')
 		{
-			$products = Product::withTrashed()
-				->where('name', 'like', '%'.session($type.'_search').'%')
-				->where('type', session('product_type'))
-				->orderBy('name', 'asc')
-				->paginate(6);
+			$products->where('type_id', session('product_type'));
 		}
+		$products->orderBy('type_id', 'asc')
+			->orderBy('name', 'asc');
 
 		return view('product.list')->with([
-			'products' => $products,
-			'type' => $type,
+			'products' => $products->paginate(6),
 		]);
 	}
 
-	public function restorePost($type = null, $product)
+	public function restorePost($product)
 	{
-		if($type != 'Minuman' && $type != 'Parfum' && $type != 'Gelas Kopi')
-		{
-			return redirect()->route('products.index', ['type' => 'Minuman'])->with([
-				'alert_messages' => $type.' tidak ditemukan. Mengembalikan ke semula: Minuman',
-				'alert_type' => 'alert-info',
-			]);
-		}
-		session(['product_type' => $type]);
-
 		DB::beginTransaction();
 
 		$product = Product::onlyTrashed()
@@ -297,22 +250,33 @@ class ProductController extends Controller
 		{
 			$userLog = UserLog::create([
 				'user_id' => Auth::id(),
-				'description' => 'Mengaktifkan kembali '.session('product_type').' ID #'.$product->id.' ('.$product->name.')',
+				'description' => 'Mengaktifkan kembali '.$product->type->name.' ID #'.$product->id.' ('.$product->name.')',
 				'creation_date' => date('Y-m-d H:i:s'),
 			]);
 			if($userLog)
 			{
-				DB::commit();
-				return redirect()->route('products.index', ['type' => session('product_type')])->with([
-					'alert_messages' => 'Pengaktifan kembali '.session('product_type').' '.$product->name.' berhasil',
-					'alert_type' => 'alert-success',
-				]);
+				goto success;
 			}
 		}
 		DB::rollBack();
-		return redirect()->route('products.index', ['type' => session('product_type')])->with([
-			'alert_messages' => 'Pengaktifan kembali '.session('product_type').' '.$product->name.' gagal',
+		return redirect()->route('products.index')->with([
+			'alert_messages' => 'Pengaktifan kembali '.$product->type->name.' '.$product->name.' gagal',
 			'alert_type' => 'alert-danger',
 		]);
+
+		success:
+		DB::commit();
+		return redirect()->route('products.index')->with([
+			'alert_messages' => 'Pengaktifan kembali '.$product->type->name.' '.$product->name.' berhasil',
+			'alert_type' => 'alert-success',
+		]);
+	}
+
+	public function checkId(Request $request)
+	{
+		$product = Product::where('name', $request->name)
+			->first();
+
+		return $product != null ? $product->id : $product;
 	}
 }

@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
-@section('title') {{ session('product_type') }} | @endsection
+@section('title') Minuman & Parfum | @endsection
 
 @section('style')
 
 @endsection
 
 @section('nav')
-	@if(Auth::user()->level == 'Admin')
+	@if(Auth::user()->level->name == 'Admin')
 		@include('layouts.nav.admin')
-	@else
+	@elseif(Auth::user()->level->name == 'Kasir')
 		@include('layouts.nav.cashier')
 	@endif
 @endsection
@@ -18,13 +18,13 @@
 @endsection
 
 @section('main')
-<section id="{{ $type }}-title" class="mt-3">
+<section id="product-title" class="mt-3">
 	<div class="container">
-		<h1>Kelola Data {{ session('product_type') }}</h1>
+		<h1>Kelola Data Minuman & Parfum</h1>
 	</div>
 </section>
 
-<section id="{{ $type }}-alert" class="mt-3">
+<section id="product-alert" class="mt-3">
 	<div class="container">
 		@if(session('alert_messages'))
 			<div class="alert {{ session('alert_type') }} alert-dismissible fade show" role="alert">
@@ -37,12 +37,12 @@
 	</div>
 </section>
 
-<section id="{{ $type }}-filter" class="mt-3">
+<section id="product-filter" class="mt-3">
 	<article class="container">
 		<div class="row">
 			<div class="col-12 col-sm-6 col-md-5">
 				<div class="input-group">
-					<input type="text" autofocus value="{{ session($type.'_search') }}" id="search" class="form-control" placeholder="Cari Nama">
+					<input type="text" autofocus value="{{ session('product_search') }}" id="search" class="form-control" placeholder="Cari Nama">
 					<div class="input-group-btn">
 						<button id="search-btn" class="btn btn-primary" type="button">
 							<span class="fa fa-search"></span>
@@ -56,26 +56,34 @@
 				</div>
 			</div>
 			<div class="col">
-				<button id="deleted-btn" class="btn btn-info btn-block {{ session($type.'_deleted') == '0' ? '' : 'active' }}" type="button" data-deleted="{{ session($type.'_deleted') }}">
-					<span class="fa {{ session($type.'_deleted') == '0' ? 'fa-folder' : 'fa-folder-open' }}"></span>
-					<span id="deleted-text">{{ session($type.'_deleted') == '0' ? session('product_type').' Aktif' : 'Semua '.session('product_type') }}</span>
+				<select name="type" id="inputtype" class="form-control">
+					<option value="">Filter Jenis</option>
+					@foreach($types as $type)
+						<option value="{{ $type->id }}" {{ session('product_type') == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
+					@endforeach
+				</select>
+			</div>
+			<div class="col">
+				<button id="deleted-btn" class="btn btn-info btn-block {{ session('product_deleted') == '0' ? '' : 'active' }}" type="button" data-deleted="{{ session('product_deleted') }}">
+					<span class="fa {{ session('product_deleted') == '0' ? 'fa-folder' : 'fa-folder-open' }}"></span>
+					<span id="deleted-text">{{ session('product_deleted') == '0' ? 'Semua Minuman/Parfum' : 'Minuman/Parfum Aktif' }}</span>
 				</button>
 			</div>
 			<div class="col">
-				<a id="new-btn" class="btn btn-success btn-block" href="{{ route('products.create', ['type' => session('product_type')]) }}">
-					<span class="fa fa-plus"></span> {{ session('product_type') }} Baru
+				<a id="new-btn" class="btn btn-success btn-block" href="{{ route('products.create') }}">
+					<span class="fa fa-plus"></span> Minuman/Parfum Baru
 				</a>
 			</div>
 		</div>
 	</article>
 </section>
 
-<section id="{{ $type }}-list" class="mt-3">
+<section id="product-list" class="mt-3">
 	<article class="container" id="data"></article>
 </section>
 
-<section id="{{ $type }}-modal">
-	<div class="modal fade" id="{{ $type }}Modal" tabindex="-1" role="dialog" aria-hidden="true">
+<section id="product-modal">
+	<div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content"></div>
 		</div>
@@ -88,36 +96,40 @@
 
 @section('script')
 <script>
-	ajaxLoad('{{ route('products.list', ['type' => session('product_type')]) }}', 'data');
+	ajaxLoad('{{ route('products.list') }}', 'data');
+
+	$("#inputtype").change(function() {
+		ajaxLoad('{{ route('products.list') }}?oktype=1&type=' + $(this).val(), 'data');
+	});
 
 	$("#search").on('keyup', function(e) {
 		if(e.keyCode == 13) {
-			ajaxLoad('{{ route('products.list', ['type' => session('product_type')]) }}?oksearch=1&search=' + $(this).val(), 'data');
+			ajaxLoad('{{ route('products.list') }}?oksearch=1&search=' + $(this).val(), 'data');
 		}
 	});
 
 	$("#search-btn").on('click', function(e) {
 		$("#search").focus();
-		ajaxLoad('{{ route('products.list', ['type' => session('product_type')]) }}?oksearch=1&search=' + $("#search").val(), 'data');
+		ajaxLoad('{{ route('products.list') }}?oksearch=1&search=' + $("#search").val(), 'data');
 	});
 
 	$("#refresh-btn").on('click', function(e) {
 		$("#search").val('').focus();
-		ajaxLoad('{{ route('products.list', ['type' => session('product_type')]) }}?oksearch=1&search=', 'data');
+		ajaxLoad('{{ route('products.list') }}?oksearch=1&search=', 'data');
 	});
 
 	$("#deleted-btn").on('click', function(e) {
 		if($(this).data('deleted') == '0') {
-			ajaxLoad('{{ route('products.list', ['type' => session('product_type')]) }}?deleted=1', 'data');
+			ajaxLoad('{{ route('products.list') }}?deleted=1', 'data');
 			$(this).addClass('active').data('deleted', '1');
 			$(this).find('span.fa').removeClass('fa-folder').addClass('fa-folder-open');
-			$(this).find('#deleted-text').html('Semua {{ session('product_type') }}');
+			$(this).find('#deleted-text').html('Minuman/Parfum Aktif');
 		}
 		else {
-			ajaxLoad('{{ route('products.list', ['type' => session('product_type')]) }}?deleted=0', 'data');
+			ajaxLoad('{{ route('products.list') }}?deleted=0', 'data');
 			$(this).removeClass('active').data('deleted', '0');
 			$(this).find('span.fa').removeClass('fa-folder-open').addClass('fa-folder');
-			$(this).find('#deleted-text').html('{{ session('product_type') }} Aktif');
+			$(this).find('#deleted-text').html('Semua Minuman/Parfum');
 		}
 	});
 

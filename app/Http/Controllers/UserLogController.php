@@ -28,12 +28,17 @@ class UserLogController extends Controller
 	public function dataList(Request $request)
 	{
 		session(['user_log_search' => $request->has('oksearch') ? $request->search : session('user_log_search', '')]);
+		session(['user_log_date1' => $request->has('okdate1') ? $request->date1 : session('user_log_date1', date('Y-m-d'))]);
+		session(['user_log_date2' => $request->has('okdate2') ? $request->date2 : session('user_log_date2', date('Y-m-d'))]);
 
-		$user_logs = UserLog::whereHas('user', function($query) {
-			$query->withTrashed();
-			$query->where('name', 'like', '%'.session('user_log_search').'%');
-		})
-			->orWhere('description', 'like', '%'.session('user_log_search').'%')
+		$user_logs = UserLog::where(function($query) {
+				$query->whereHas('user', function($query2) {
+					$query2->withTrashed();
+					$query2->where('name', 'like', '%'.session('user_log_search').'%');
+				})
+				->orWhere('description', 'like', '%'.session('user_log_search').'%');
+			})
+			->whereBetween('creation_date', [session('user_log_date1'), session('user_log_date2').' 23:59:59'])
 			->with([
 				'user' => function($query) {
 					$query->withTrashed();

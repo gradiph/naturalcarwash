@@ -52,7 +52,7 @@
 								<div class="col-8">
 									<select name="status" id="inputstatus" class="form-control" required>
 										<option value="Bagus">Bagus</option>
-										<option value="Jelek">Jelek</option>
+										<option value="Kurang Bagus">Kurang Bagus</option>
 										<option value="Rusak">Rusak</option>
 									</select>
 									@if($errors->has('status'))

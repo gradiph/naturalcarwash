@@ -1,6 +1,6 @@
 @php include_once(app_path().'/functions/indonesian_currency.php'); @endphp
 <div class="modal-header">
-	<h4 class="modal-title" id="modal-title">{{ session('product_type') }} <strong>{{ $product->name }}</strong></h4>
+	<h4 class="modal-title" id="modal-title"><strong>{{ $product->name }}</strong></h4>
     <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
 </div>
 <div class="modal-body">
@@ -11,6 +11,11 @@
 					<td class="align-top">Nama</td>
 					<td class="align-top">&nbsp; : &nbsp;</td>
 					<td class="align-top">{{ $product->name }}</td>
+				</tr>
+				<tr>
+					<td class="align-top">Jenis</td>
+					<td class="align-top">&nbsp; : &nbsp;</td>
+					<td class="align-top">{{ $product->type->name }}</td>
 				</tr>
 				<tr>
 					<td class="align-top">Harga</td>
@@ -43,7 +48,7 @@
 		</div>
 	@else
 		<div class="col">
-			<a href="{{ route('products.edit', ['type' => session('product_type'), 'product' => $product->id]) }}" id="edit-btn" class="btn btn-warning btn-block">
+			<a href="{{ route('products.edit', ['product' => $product->id]) }}" id="edit-btn" class="btn btn-warning btn-block">
 				<span class="fa fa-pencil"></span> Ubah
 			</a>
 		</div>
@@ -51,7 +56,7 @@
 			<button id="add-btn" class="btn btn-success btn-block">
 				<span class="fa fa-plus"></span> Tambah Stok
 			</button>
-			<form id="createProductForm" action="{{ route('products.create', ['type' => session('product_type')]) }}" method="post" hidden>
+			<form id="createProductForm" action="{{ route('products.store') }}" method="post" hidden>
 				{{ csrf_field() }}
 				<input type="hidden" id="inputid" name="id" value="{{ $product->id }}">
 				<input type="hidden" id="inputqty" name="qty">

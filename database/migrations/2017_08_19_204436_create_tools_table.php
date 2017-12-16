@@ -17,7 +17,7 @@ class CreateToolsTable extends Migration
             $table->increments('id');
 			$table->string('name');
 			$table->integer('qty');
-			$table->enum('status', ['Bagus', 'Jelek', 'Rusak']);
+			$table->enum('status', ['Bagus', 'Kurang Bagus', 'Rusak']);
         });
     }
 

@@ -21,6 +21,8 @@ class CreateTransactionsTable extends Migration
             $table->timestamp('creation_date');
 			$table->enum('status', ['1', '0']);
 			$table->string('cancel_reason')->nullable();
+			$table->integer('wash_total')->default(0);
+			$table->integer('nonwash_total')->default(0);
         });
     }
 

@@ -55,6 +55,11 @@
 				font-weight: 100;
             }
 
+			.subtitle {
+				font-size: 16px;
+				font-family: verdana;
+			}
+
             .m-b-md {
                 margin-bottom: 30px;
             }
@@ -63,10 +68,9 @@
     <body>
         <div class="flex-center position-ref full-height">
             <div class="content">
-                <div class="title m-b-md">
-                    {{ config('app.name') }}
+                <div class="title">
+                    {{ config('app.name') }}<em class="subtitle">v1.0</em>
                 </div>
-
                 <div class="links">
                     <form action="{{ route('login') }}" method="post" id="loginForm" novalidate>
 						@if(session('alert_messages'))

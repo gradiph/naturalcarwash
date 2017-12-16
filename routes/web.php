@@ -35,43 +35,41 @@ Route::middleware(['auth'])->group(function() {
 	Route::get('/expenditures/list', 'ExpenditureController@dataList')->name('expenditures.list');
 	Route::resource('/expenditures', 'ExpenditureController');
 
-	Route::get('/mechanics/list', 'MechanicController@dataList')->name('mechanics.list');
-	Route::post('/mechanics/{mechanic}/restore', 'MechanicController@restorePost')->name('mechanics.restore');
-	Route::resource('/mechanics', 'MechanicController');
+	Route::get('/products/list', 'ProductController@dataList')->name('products.list');
+	Route::get('/products/check/id', 'ProductController@checkId')->name('products.check.id');
+	Route::post('/products/{product}/restore', 'ProductController@restorePost')->name('products.restore');
+	Route::resource('/products', 'ProductController');
 
-	Route::get('/products/{type?}/list', 'ProductController@dataList')->name('products.list');
-	Route::get('/products/{type?}', 'ProductController@index')->name('products.index');
-	Route::get('/products/{type?}/create', 'ProductController@create')->name('products.create');
-	Route::get('/products/{type?}/show/{product}', 'ProductController@show')->name('products.show');
-	Route::get('/products/{type?}/show/{product}/edit', 'ProductController@edit')->name('products.edit');
-	Route::put('/products/{type?}/show/{product}', 'ProductController@update')->name('products.update');
-	Route::any('/products/{type?}/show/{product}/destroy', 'ProductController@destroy')->name('products.destroy');
-	Route::post('/products/{type?}/create', 'ProductController@store')->name('products.store');
-	Route::post('/products/{type?}/show/{product}/restore', 'ProductController@restorePost')->name('products.restore');
+//	Route::get('/purchases/list', 'PurchaseController@dataList')->name('purchases.list');
+//	Route::resource('/purchases', 'PurchaseController');
 
-	Route::get('/purchases/list', 'PurchaseController@dataList')->name('purchases.list');
-	Route::resource('/purchases', 'PurchaseController');
-
-	Route::get('/reports/list', 'ReportController@dataList')->name('reports.list');
-	Route::resource('/reports', 'ReportController');
-
-	Route::get('/tools/list', 'ToolController@dataList')->name('tools.list');
-	Route::resource('/tools', 'ToolController');
+//	Route::get('/tools/list', 'ToolController@dataList')->name('tools.list');
+//	Route::resource('/tools', 'ToolController');
 
 	Route::get('/transactions/list', 'TransactionController@dataList')->name('transactions.list');
 	Route::resource('/transactions', 'TransactionController');
 
-	Route::get('/users/list', 'UserController@dataList')->name('users.list');
-	Route::post('/users/{user}/restore', 'UserController@restorePost')->name('users.restore');
-	Route::resource('/users', 'UserController');
+	Route::middleware(['auth.admin'])->group(function() {
+		Route::delete('/home/transaction/{transaction}/cancel', 'HomeController@cancelTransaction')->name('home.cancel.transaction');
 
-	Route::get('/user-logs/list', 'UserLogController@dataList')->name('user-logs.list');
-	Route::resource('/user-logs', 'UserLogController', ['only' => ['index', 'show']]);
+		Route::get('/reports/list', 'ReportController@dataList')->name('reports.list');
+		Route::resource('/reports', 'ReportController');
 
-	Route::get('/washes/list', 'WashController@dataList')->name('washes.list');
-	Route::resource('/washes', 'WashController');
+		Route::get('/mechanics/list', 'MechanicController@dataList')->name('mechanics.list');
+		Route::post('/mechanics/{mechanic}/restore', 'MechanicController@restorePost')->name('mechanics.restore');
+		Route::resource('/mechanics', 'MechanicController');
 
-	Route::get('/washing-rates/list', 'WashingRateController@dataList')->name('washing-rates.list');
-	Route::post('/washing-rates/{washing_rate}/restore', 'WashingRateController@restorePost')->name('washing-rates.restore');
-	Route::resource('/washing-rates', 'WashingRateController');
+		Route::get('/users/list', 'UserController@dataList')->name('users.list');
+		Route::post('/users/{user}/restore', 'UserController@restorePost')->name('users.restore');
+		Route::resource('/users', 'UserController');
+
+		Route::get('/user-logs/list', 'UserLogController@dataList')->name('user-logs.list');
+		Route::resource('/user-logs', 'UserLogController', ['only' => ['index', 'show']]);
+
+		Route::get('/washing-rates/list', 'WashingRateController@dataList')->name('washing-rates.list');
+		Route::post('/washing-rates/{washing_rate}/restore', 'WashingRateController@restorePost')->name('washing-rates.restore');
+		Route::resource('/washing-rates', 'WashingRateController');
+
+		Route::get('/docs', 'HomeController@docs')->name('docs');
+	});
 });

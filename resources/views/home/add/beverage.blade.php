@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title') Beranda: Tambah Minuman | @endsection
+@section('title') Beranda: Tambah Minuman/Parfum | @endsection
 
 @section('style')
 
@@ -20,7 +20,7 @@
 			<div class="col-sm-10 col-md-8 col-lg-6 mx-auto">
 				<div class="card">
 					<div class="card-header">
-						Nomor Transaksi #{{ $transaction->id }}: Tambah Minuman
+						Nomor Transaksi #{{ $transaction->id }}: Tambah Minuman/Parfum
 					</div>
 					<div class="card-body">
 						<form action="{{ route('home.wash.add.beverage', ['wash' => $wash->id]) }}" method="post" id="add-beverage-form" role="form">
@@ -34,15 +34,13 @@
 									@endif
 								</div>
 							</div>
-							<div class="form-group row">
-								<label for="inputname" class="col-4 col-form-label">Nama Minuman</label>
-								<div class="col-8">
-									<input type="text" id="inputname" name="name" value="{{ old('name') }}" class="form-control" autocomplete="off">
-									@if($errors->has('product_id'))
-										<div class="invalid-feedback" style="font-size: 0.9em;">{{ $errors->get('product_id')[0] }}</div>
-									@endif
-									<div id="showProduct"></div>
-								</div>
+							<div class="form-group">
+								<label for="inputname" class="col-form-label">Nama Minuman/Parfum</label>
+								<input type="text" id="inputname" name="name" value="{{ old('name') }}" class="form-control" autocomplete="off">
+								@if($errors->has('product_id'))
+									<div class="invalid-feedback" style="font-size: 0.9em;">{{ $errors->get('product_id')[0] }}</div>
+								@endif
+								<div id="showProduct"></div>
 							</div>
 						</form>
 					</div>

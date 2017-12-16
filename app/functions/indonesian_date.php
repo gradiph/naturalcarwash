@@ -64,4 +64,29 @@ function indo_short_date($date)
 
 	return $indo_date;
 }
+
+function indo_month($month)
+{
+	$months = [
+		'01' => 'Januari',
+		'02' => 'Februari',
+		'03' => 'Maret',
+		'04' => 'April',
+		'05' => 'Mei',
+		'06' => 'Juni',
+		'07' => 'Juli',
+		'08' => 'Agustus',
+		'09' => 'September',
+		'10' => 'Oktober',
+		'11' => 'November',
+		'12' => 'Desember',
+	];
+
+	$year = substr($month, 0, 4);
+	$month = substr($month, 5, 2);
+
+	$indo_month = $months[$month].' '.$year;
+
+	return $indo_month;
+}
 ?>

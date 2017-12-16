@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\HomeAddBeverageRequest;
+use App\Http\Requests\HomeCancelTransactionRequest;
 use App\Http\Requests\HomeStoreWashRequest;
 use Illuminate\Http\Request;
 use App\Mechanic;
 use App\Product;
 use App\Transaction;
+use App\UserLog;
 use App\Wash;
 use App\WashingRate;
 use Auth;
@@ -17,14 +19,9 @@ class HomeController extends Controller
 {
     public function index()
 	{
-        if(Auth::user()->level->name == 'Admin')
-        {
-            return redirect()->route('reports.index');
-        }
+        $washes = Wash::all();
 
-		$washes = Wash::all();
-
-		return view('home.cashier')->with([
+		return view('home.index')->with([
 			'washes' => $washes,
 		]);
 	}
@@ -47,7 +44,7 @@ class HomeController extends Controller
 		$transaction = Transaction::create([
 			'user_id' => Auth::id(),
 			'type' => $request->type,
-			'description' => $request->has('description') ? $request->description : null,
+			'worker_description' => $request->has('description') ? $request->description : null,
 			'creation_date' => date('Y-m-d H:i:s'),
 			'status' => '1',
 			'cancel_reason' => null,
@@ -63,12 +60,12 @@ class HomeController extends Controller
 			{
 				foreach($request->washing_rate_id as $washing_rate_id)
 				{
-					$countBefore = $wash->washingRates()->count();
+					$countBefore = $wash->rates()->count();
 
 					$washingRate = WashingRate::find($washing_rate_id);
-					$wash->washingRates()->attach($washingRate->id, ['price' => $washingRate->price]);
+					$wash->rates()->attach($washingRate->id, ['price' => $washingRate->price]);
 
-					$countAfter = $wash->washingRates()->count();
+					$countAfter = $wash->rates()->count();
 
 					if($countAfter <= $countBefore)
 					{
@@ -112,7 +109,7 @@ class HomeController extends Controller
 
 	public function calculateWash(Wash $wash)
 	{
-		$washing_rates = $wash->washingRates;
+		$washing_rates = $wash->rates;
 		$transaction = $wash->transaction;
 		$transaction->load([
 			'mechanics' => function($query) {
@@ -143,6 +140,7 @@ class HomeController extends Controller
 	public function showProduct($name = "")
 	{
 		$products = Product::where('name', 'like', '%'.$name.'%')
+			->with('type')
 			->take(4)
 			->orderBy('name', 'asc')
 			->get();
@@ -235,9 +233,8 @@ class HomeController extends Controller
 			}
 
 			DB::commit();
-			return redirect()->route('home.index')->with([
-				'alert_messages' => 'Berhasil membuat transaksi noncucian baru',
-				'alert_type' => 'alert-success',
+			return redirect()->route('home.print.invoice', ['transaction' => $transaction->id])->with([
+				'transaction' => $transaction,
 			]);
 		}
 
@@ -272,5 +269,63 @@ class HomeController extends Controller
 			'products' => $transaction->products,
 			'mechanics' => $transaction->mechanics,
 		]);
+	}
+
+	public function cancelTransaction(Transaction $transaction, HomeCancelTransactionRequest $request)
+	{
+		DB::beginTransaction();
+
+		$transaction->status = '0';
+		$transaction->cancel_reason = $request->reason;
+
+		if($transaction->save())
+		{
+			foreach($transaction->products as $product)
+			{
+				$product->qty += $product->pivot->qty;
+				if(!$product->save())
+				{
+					goto error;
+				}
+
+				$countBefore = $transaction->products()->count();
+				$transaction->products()->detach($product->id);
+				$countAfter = $transaction->products()->count();
+				if($countAfter >= $countBefore)
+				{
+					goto error;
+				}
+			}
+
+			$transaction->wash->delete();
+
+			$userLog = UserLog::create([
+				'user_id' => Auth::id(),
+				'description' => 'membatalkan transaksi nomor #'.$transaction->id,
+				'creation_date' => date('Y-m-d H:i:s'),
+			]);
+			if($userLog)
+			{
+				goto success;
+			}
+		}
+
+		error:
+		DB::rollBack();
+		return redirect()->route('home.index')->with([
+			'alert_messages' => 'Gagal membatalkan transaksi nomor #'.$transaction->id,
+			'alert_type' => 'alert-danger',
+		]);
+
+		success:
+		DB::commit();
+		return redirect()->route('home.index')->with([
+			'alert_messages' => 'Berhasil membatalkan transaksi nomor #'.$transaction->id,
+			'alert_type' => 'alert-success',
+		]);
+	}
+
+	public function docs() {
+		return view('docs');
 	}
 }

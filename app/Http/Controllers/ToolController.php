@@ -125,13 +125,17 @@ class ToolController extends Controller
 	public function dataList(Request $request)
 	{
 		session(['tool_search' => $request->has('oksearch') ? $request->search : session('tool_search', '')]);
+		session(['tool_status' => $request->has('okstatus') ? $request->status : session('tool_status', '')]);
 
-		$tools = Tool::where('name', 'like', '%'.session('tool_search').'%')
-				->orderBy('name', 'asc')
-				->paginate(6);
+		$tools = Tool::where('name', 'like', '%'.session('tool_search').'%');
+		if(session('tool_status') != '')
+		{
+			$tools->where('status', session('tool_status'));
+		}
+		$tools->orderBy('name', 'asc');
 
 		return view('tool.list')->with([
-			'tools' => $tools,
+			'tools' => $tools->paginate(6),
 		]);
 	}
 }

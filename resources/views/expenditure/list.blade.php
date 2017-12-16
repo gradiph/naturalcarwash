@@ -4,6 +4,7 @@
 		<thead class="thead-inverse">
 			<th class="text-center">NO</th>
 			<th class="text-center">TANGGAL</th>
+			<th class="text-center">JENIS</th>
 			<th class="text-center">NAMA</th>
 			<th class="text-center">KETERANGAN</th>
 			<th class="text-center">HARGA</th>
@@ -18,8 +19,9 @@
 							{{ indo_short_date($expenditure->creation_date) }}
 						</a>
 					</td>
+					<td>{{ $expenditure->type->name }}</td>
 					<td>{{ $expenditure->user->name }}</td>
-					<td>{{ $expenditure->description }}</td>
+					<td>{{ substr($expenditure->description, 0, 20) . ((strlen($expenditure->description) > 20) ? '...' : '') }}</td>
 					<td>{{ indo_currency($expenditure->price) }}</td>
 				</tr>
 			@endforeach

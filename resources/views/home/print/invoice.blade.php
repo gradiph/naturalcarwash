@@ -21,7 +21,6 @@
             display: block;
             width: 44mm;
             min-height: 48mm;
-			background: yellow;
         }
 		#border {
 			border-top: 2px dashed black;
@@ -80,7 +79,7 @@
     					<u>Transaksi Cucian</u>
     				</div>
     				<div id="wash-list">
-    					@foreach($wash->washingRates as $washing_rate)
+    					@foreach($wash->rates as $washing_rate)
     						<div class="washing-rate">
     							<span class="washing-rate-name">
     								{{ $loop->iteration }}. {{ $washing_rate->name }}
@@ -139,10 +138,10 @@
 <script src="{{asset('/js/jquery-3.2.1.min.js')}}"></script>
 <script>
     $(document).ready(function() {
-//        window.print();
-//        setTimeout(function() {
-//			window.close();
-//		}, 100);
+        window.print();
+        setTimeout(function() {
+			window.location.href = "{{ route('home.index') }}";
+		}, 1000);
     });
 </script>
 </html>

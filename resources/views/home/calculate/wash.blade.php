@@ -95,17 +95,34 @@
 			<span class="fa fa-check"></span> Selesai
 		</button>
 	</div>
-	<div class="col">
-		<button type="button" class="btn btn-secondary btn-block" data-dismiss="modal" aria-label="Close">
-			<span class="fa fa-times"></span> Batal
-		</button>
-	</div>
+	@if(Auth::user()->level->name == 'Admin')
+		<div class="col">
+			<button type="submit" class="btn btn-danger btn-block" form="cancel-transaction-form">
+				<span class="fa fa-times"></span> Batalkan Transaksi
+			</button>
+			<form action="{{ route('home.cancel.transaction', ['transaction' => $wash->transaction_id]) }}" id="cancel-transaction-form" method="post">
+				{{ csrf_field() }}
+				{{ method_field('delete') }}
+				<input type="hidden" id="inputreason" name="reason">
+			</form>
+		</div>
+	@endif
 </div>
 <script>
 	$("#check-out-btn").click(function(e) {
 		var d = confirm("Selesai?");
 		if(d) {
 			$(".loading").show();
+		}
+		else {
+			e.preventDefault();
+		}
+	});
+
+	$("#cancel-transaction-form").submit(function(e) {
+		var d = prompt('Alasan pembatalan?');
+		if(d != '') {
+			$("#inputreason").val(d);
 		}
 		else {
 			e.preventDefault();

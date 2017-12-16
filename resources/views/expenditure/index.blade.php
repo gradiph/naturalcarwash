@@ -7,9 +7,9 @@
 @endsection
 
 @section('nav')
-	@if(Auth::user()->level == 'Admin')
+	@if(Auth::user()->level->name == 'Admin')
 		@include('layouts.nav.admin')
-	@else
+	@elseif(Auth::user()->level->name == 'Kasir')
 		@include('layouts.nav.cashier')
 	@endif
 @endsection
@@ -54,6 +54,14 @@
 						</button>
 					</div>
 				</div>
+			</div>
+			<div class="col">
+				<select id="inputtype" class="form-control">
+					<option value="">Filter Jenis</option>
+					@foreach($types as $type)
+						<option value="{{ $type->id }}" {{ session('expenditure_text') == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
+					@endforeach
+				</select>
 			</div>
 			<div class="col">
 				<a id="new-btn" class="btn btn-success btn-block" href="{{ route('expenditures.create') }}">

@@ -35,7 +35,7 @@
 			<hr>
 		</div>
 		<div class="form-group">
-			<h3>Tarif <small>= <span id="total">0</span></small></h3>
+			<h3>Tarif <small>= <span id="modal-total">0</span></small></h3>
 			<div id="washing-rates"></div>
 		</div>
 		<div class="form-group row">
@@ -119,7 +119,7 @@
 			"</div>"
 		);
 		price_total += price;
-		$("#total").html(price_total.toLocaleString());
+		$("#modal-total").html(price_total.toLocaleString());
 
 		if(name == 'Salon') {
 			$("#select-mechanics").removeAttr('hidden');

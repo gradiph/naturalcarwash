@@ -12,6 +12,6 @@ class Tool extends Model
     protected $fillable = [
 		'name', //string
 		'qty', //integer
-        'status', //enum['Bagus', 'Jelek', 'Rusak']
+        'status', //enum['Bagus', 'Kurang Bagus', 'Rusak']
     ];
 }

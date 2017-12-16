@@ -15,6 +15,8 @@ class Transaction extends Model
 		'creation_date', //timestamp
 		'status', //enum['1', '0'] : 1=success, 0=cancel
 		'cancel_reason', //string, nullable
+		'wash_total', //integer
+		'nonwash_total', //integer
     ];
 
 	protected $dates = [

@@ -4,6 +4,7 @@
 		<thead class="thead-inverse">
 			<th class="text-center">NO</th>
 			<th class="text-center">NAMA</th>
+			<th class="text-center">JENIS</th>
 			<th class="text-center">HARGA</th>
 			<th class="text-center">JUMLAH</th>
 			<th class="text-center">STATUS</th>
@@ -14,10 +15,11 @@
 				<tr>
 					<td>{{ ++$i }}</td>
 					<td>
-						<a class="btn-link" href="#show" data-link="{{ route('products.show', ['type' => session('product_type'), 'product' => $product->id]) }}">
+						<a class="btn-link" href="#show" data-link="{{ route('products.show', ['product' => $product->id]) }}">
 							{{ $product->name }}
 						</a>
 					</td>
+					<td>{{ $product->type->name }}</td>
 					<td>{{ indo_currency($product->price) }}</td>
 					<td>{{ indo_currency($product->qty) }}</td>
 					<td>{{ $product->deleted_at == null ? 'Aktif' : 'Nonaktif' }}</td>
@@ -27,7 +29,7 @@
 	</table>
 </div>
 <div>
-	<small>Catatan: Klik nama {{ session('product_type') }} untuk melihat informasi lebih lengkap.</small>
+	<small>Catatan: Klik nama minuman/parfum untuk melihat informasi lebih lengkap.</small>
 </div>
 <div class="row">
     <div class="col-4">
@@ -47,7 +49,7 @@
 	$("a.btn-link").click(function(e) {
 		e.preventDefault();
 		$(".loading").show();
-		$("#{{ $type }}Modal").modal('show').find('.modal-content').empty().load($(this).data('link'), function() {
+		$("#productModal").modal('show').find('.modal-content').empty().load($(this).data('link'), function() {
 			$(".loading").hide();
 		});
 	});
