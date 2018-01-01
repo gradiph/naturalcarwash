@@ -70,6 +70,6 @@ Route::middleware(['auth'])->group(function() {
 		Route::post('/washing-rates/{washing_rate}/restore', 'WashingRateController@restorePost')->name('washing-rates.restore');
 		Route::resource('/washing-rates', 'WashingRateController');
 
-		Route::get('/docs', 'HomeController@docs')->name('docs');
+		//Route::get('/docs', 'HomeController@docs')->name('docs');
 	});
 });

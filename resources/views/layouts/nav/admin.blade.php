@@ -49,9 +49,11 @@
 				</li>
 			</ul>
 			<ul class="navbar-nav">
+				{{--
 				<li class="nav-item {{ Route::currentRouteName() == 'docs' ? 'active' : '' }}">
 					<a class="nav-link" href="{{ route('docs') }}"><span class="fa fa-book fa-fw"></span> Dokumentasi</a>
 				</li>
+				--}}
 
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#{{ Auth::user()->name }}" id="authDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-user-circle fa-fw"></span> {{ Auth::user()->name }}</a>
